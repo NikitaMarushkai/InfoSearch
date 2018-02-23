@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 public class ParserImpl implements Parser {
 
     @Override
-    public void parse(int depth, String url, WhatToParse inOut) throws Exception {
+    public void parse(int depth, String url, WhatToParse inOut, String fileName) throws Exception {
         Map<String, Set<String>> elements = new ConcurrentHashMap<>();
         elements.put(url, this.getInitialSet(url, inOut));
         Map<String, Set<String>> s = this.retrieveAllLinks(depth, 0, elements, url, inOut);
@@ -23,7 +23,7 @@ public class ParserImpl implements Parser {
         // пройтись по сету с вершинами, если в мапе есть вершина - нужно ставить 0, иначе 1
         int[][] adjacency = new int[linksSet.size()][linksSet.size()];
 
-        try (FileWriter writer = new FileWriter("C:\\Programming\\infosearch\\matrix.csv")) {
+        try (FileWriter writer = new FileWriter(fileName)) {
             int i = 0;
             for (String line : linksSet) {
                 int j = 0;
@@ -43,8 +43,8 @@ public class ParserImpl implements Parser {
                 i++;
             }
         }
-        System.out.println(adjacency.length);
-        System.out.println(adjacency[0].length);
+        System.out.println("Matrix height: " + adjacency.length);
+        System.out.println("Matrix width: " + adjacency[0].length);
         int length = 0;
         for (int[] a : adjacency) {
             for (int b : a) {
@@ -53,9 +53,7 @@ public class ParserImpl implements Parser {
                 }
             }
         }
-        System.out.println("ones: " + length);
-        System.out.println(s);
-        System.out.println(s.size());
+        System.out.println("Ones: " + length);
     }
 
     private Document preparePage(String url) throws Exception {
@@ -91,10 +89,6 @@ public class ParserImpl implements Parser {
                     e.printStackTrace();
                 }
             });
-//            for (String link : links.get(url)) {
-//                links.put(link, this.getInitialSet(link, inOut));
-//                local_links.putAll(this.retrieveAllLinks(initialDepth, depth + 1, links, link, inOut));
-//            }
             return local_links;
         } else {
             return links;
