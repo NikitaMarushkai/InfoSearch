@@ -12,10 +12,20 @@ import java.util.stream.Stream;
 public class ParserImpl implements Parser {
 
     @Override
-    public void parse(int depth, String url, WhatToParse inOut, String fileName) throws Exception {
+    public void parse(int matrixSize, String url, WhatToParse inOut, String fileName) throws Exception {
         Map<String, Set<String>> elements = new ConcurrentHashMap<>();
         elements.put(url, this.getInitialSet(url, inOut));
-        Map<String, Set<String>> s = this.retrieveAllLinks(depth, 0, elements, url, inOut);
+        Map<String, Set<String>> s = new ConcurrentHashMap<>();
+        Set<String> failSet = new HashSet<>();
+        while (s.size() < matrixSize){
+            for (Map.Entry<String, Set<String>> entry : elements.entrySet()){
+                if (!failSet.contains(entry.getKey())) {
+                    s.putAll(this.retrieveAllLinks(1, 0, matrixSize, elements, entry.getKey(), inOut));
+                }
+                failSet.add(entry.getKey());
+            }
+            elements = s;
+        }
         Set<String> linksSet = new HashSet<>();
         for (Map.Entry<String, Set<String>> entry : s.entrySet()) {
             linksSet.add(entry.getKey());
@@ -76,15 +86,19 @@ public class ParserImpl implements Parser {
     }
 
 
-    private Map<String, Set<String>> retrieveAllLinks(int initialDepth, int depth, Map<String, Set<String>> links,
+    private Map<String, Set<String>> retrieveAllLinks(int initialDepth, int depth, int matrixSize, Map<String, Set<String>> links,
                                                       String url, WhatToParse inOut) throws RuntimeException {
         if (depth < initialDepth) {
             Map<String, Set<String>> local_links = new ConcurrentHashMap<>();
             Stream<String> linksStream = links.get(url).parallelStream();
             linksStream.forEach(link -> {
                 try {
-                    links.put(link, this.getInitialSet(link, inOut));
-                    local_links.putAll(this.retrieveAllLinks(initialDepth, depth + 1, links, link, inOut));
+                    if (links.size() < matrixSize) {
+                        links.put(link, this.getInitialSet(link, inOut));
+                        local_links.putAll(this.retrieveAllLinks(initialDepth, depth + 1, matrixSize, links, link, inOut));
+                    } else {
+                        return;
+                    }
                 } catch (Exception e){
                     e.printStackTrace();
                 }
