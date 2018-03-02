@@ -13,14 +13,18 @@ public class ParserImpl implements Parser {
 
     @Override
     public void parse(int matrixSize, String url, WhatToParse inOut, String fileName) throws Exception {
+        String initialUrl = url;
+        Set<String> forbidden = new HashSet<>();
+        forbidden.add("mailto");
         Map<String, Set<String>> elements = new ConcurrentHashMap<>();
-        elements.put(url, this.getInitialSet(url, inOut));
+        elements.put(url, this.getInitialSet(url, initialUrl, inOut, forbidden));
         Map<String, Set<String>> s = new ConcurrentHashMap<>();
         Set<String> failSet = new HashSet<>();
         while (s.size() < matrixSize){
             for (Map.Entry<String, Set<String>> entry : elements.entrySet()){
                 if (!failSet.contains(entry.getKey())) {
-                    s.putAll(this.retrieveAllLinks(1, 0, matrixSize, elements, entry.getKey(), inOut));
+                    s.putAll(this.retrieveAllLinks(1, 0, matrixSize, elements, entry.getKey(), inOut,
+                            forbidden, initialUrl));
                 }
                 failSet.add(entry.getKey());
             }
@@ -87,15 +91,17 @@ public class ParserImpl implements Parser {
 
 
     private Map<String, Set<String>> retrieveAllLinks(int initialDepth, int depth, int matrixSize, Map<String, Set<String>> links,
-                                                      String url, WhatToParse inOut) throws RuntimeException {
+                                                      String url, WhatToParse inOut, Set<String> forbidden,
+                                                      String initialUrl) throws RuntimeException {
         if (depth < initialDepth) {
             Map<String, Set<String>> local_links = new ConcurrentHashMap<>();
             Stream<String> linksStream = links.get(url).parallelStream();
             linksStream.forEach(link -> {
                 try {
                     if (links.size() < matrixSize) {
-                        links.put(link, this.getInitialSet(link, inOut));
-                        local_links.putAll(this.retrieveAllLinks(initialDepth, depth + 1, matrixSize, links, link, inOut));
+                        links.put(link, this.getInitialSet(link, initialUrl, inOut, forbidden));
+                        local_links.putAll(this.retrieveAllLinks(initialDepth, depth + 1, matrixSize, links, link, inOut,
+                                forbidden, initialUrl));
                     } else {
                         return;
                     }
@@ -109,28 +115,32 @@ public class ParserImpl implements Parser {
         }
     }
 
-    private Set<String> getInitialSet(String url, WhatToParse inOut) throws Exception {
+    private Set<String> getInitialSet(String url, String initialUrl, WhatToParse inOut, Set<String> forbidden) throws Exception {
         Document doc = this.preparePage(url);
         Elements currentElements;
         Set<String> links = new HashSet<>();
         try {
             currentElements = doc.body().select("a[href]");
             for (Element element : currentElements) {
-                switch (inOut) {
-                    case ALL:
-                        links.add(element.attr("abs:href"));
-                        break;
-                    case INNER:
-                        if (element.attr("abs:href").contains(url)) {
-                            links.add(element.attr("abs:href"));
+                forbidden.forEach(f -> {
+                    if (!element.attr("abs:href").contains(f)){
+                        switch (inOut) {
+                            case ALL:
+                                links.add(element.attr("abs:href"));
+                                break;
+                            case INNER:
+                                if (element.attr("abs:href").contains(initialUrl)) {
+                                    links.add(element.attr("abs:href"));
+                                }
+                                break;
+                            case OUTER:
+                                if (!element.attr("abs:href").contains(initialUrl)) {
+                                    links.add(element.attr("abs:href"));
+                                }
+                                break;
                         }
-                        break;
-                    case OUTER:
-                        if (!element.attr("abs:href").contains(url)) {
-                            links.add(element.attr("abs:href"));
-                        }
-                        break;
-                }
+                    }
+                });
             }
         } catch (NullPointerException e) {
             return links;
