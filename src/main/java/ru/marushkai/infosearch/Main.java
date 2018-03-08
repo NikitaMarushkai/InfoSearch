@@ -7,6 +7,7 @@ import ru.marushkai.infosearch.parser.implementation.ParserImpl;
 import ru.marushkai.infosearch.parser.enums.WhatToParse;
 
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.List;
 
 public class Main {
@@ -17,9 +18,8 @@ public class Main {
         String fileName = "C:\\Programming\\infosearch\\matrix_marushkai.csv";
         try {
             List<List<? extends Number>> readyMatrix = pageRank.prepareMatrix(pageRank.readMatrix(fileName));
-            for (Double m : pageRank.calculatePageRank(readyMatrix, 50)){
-                System.out.print(m + ", ");
-            }
+            Arrays.stream(pageRank.calculatePageRank(readyMatrix, 50))
+                    .forEach(v -> System.out.print(v + ", "));
             System.out.println();
         } catch (FileNotFoundException e) {
             try {
@@ -27,9 +27,8 @@ public class Main {
                         fileName);
                 List<List<? extends Number>> readyMatrix = pageRank.prepareMatrix(pageRank.readMatrix(fileName));
 
-                for (Double m : pageRank.calculatePageRank(readyMatrix, 10)){
-                    System.out.print(m + ", ");
-                }
+                Arrays.stream(pageRank.calculatePageRank(readyMatrix, 50))
+                        .forEach(v -> System.out.print(v + ", "));
                 System.out.println();
             } catch (Exception e1) {
                 e1.printStackTrace();
