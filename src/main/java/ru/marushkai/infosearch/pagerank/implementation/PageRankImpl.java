@@ -69,7 +69,7 @@ public class PageRankImpl implements PageRank {
 
 
         newVector = Arrays.stream(newVector)
-                .map(v -> v * 0.85)
+                .map(v -> (1. - 0.85) + v * 0.85)
                 .toArray(Double[]::new);
 
         return newVector;

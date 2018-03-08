@@ -17,7 +17,7 @@ public class Main {
         String fileName = "C:\\Programming\\infosearch\\matrix_marushkai.csv";
         try {
             List<List<? extends Number>> readyMatrix = pageRank.prepareMatrix(pageRank.readMatrix(fileName));
-            for (Double m : pageRank.calculatePageRank(readyMatrix, 25)){
+            for (Double m : pageRank.calculatePageRank(readyMatrix, 50)){
                 System.out.print(m + ", ");
             }
             System.out.println();
