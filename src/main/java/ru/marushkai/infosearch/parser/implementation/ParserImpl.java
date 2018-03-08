@@ -1,8 +1,12 @@
+package ru.marushkai.infosearch.parser.implementation;
+
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import ru.marushkai.infosearch.parser.enums.WhatToParse;
+import ru.marushkai.infosearch.parser.interfaces.Parser;
 
 import java.io.FileWriter;
 import java.util.*;
