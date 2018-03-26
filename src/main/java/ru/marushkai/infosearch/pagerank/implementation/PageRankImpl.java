@@ -39,25 +39,44 @@ public class PageRankImpl implements PageRank {
         return initialVector;
     }
 
-    @Override
-    public List<List<? extends Number>> prepareMatrix(List<List<? extends Number>> matrix) {
-        // Transpose matrix
-        List<List<? extends Number>> transposedMatrix = new ArrayList<>();
-
-        for (int i = 0; i < matrix.get(0).size(); i++) {
-            List<Double> newLine = new ArrayList<>();
-            for (List<? extends Number> row : matrix) {
-                newLine.add(row.get(i).doubleValue());
-            }
-            if (Collections.frequency(newLine, 0.) == newLine.size()){
-                newLine.replaceAll(e -> 1. / newLine.size());
+    //    @Override
+//    public List<List<? extends Number>> prepareMatrix(List<List<? extends Number>> matrix) {
+//        // Transpose matrix
+//        List<List<? extends Number>> transposedMatrix = new ArrayList<>();
+//
+//        for (int i = 0; i < matrix.get(0).size(); i++) {
+//            List<Double> newLine = new ArrayList<>();
+//            for (List<? extends Number> row : matrix) {
+//                newLine.add(row.get(i).doubleValue());
+//            }
+//            if (Collections.frequency(newLine, 0.) == newLine.size()){
+//                newLine.replaceAll(e -> 1. / newLine.size());
+//            } else {
+//                int numberOfOnes = Collections.frequency(newLine, 1.);
+//                newLine.replaceAll(e -> e / numberOfOnes);
+//            }
+//            transposedMatrix.add(newLine);
+//        }
+//        return transposedMatrix;
+//    }
+//@Override
+    public Map<Integer, Map<Integer, Double>> prepareMatrix(Map<Integer, List<Integer>> matrix) {
+        Map<Integer, Map<Integer, Double>> newMatrix = new HashMap<>();
+        for (Map.Entry<Integer, List<Integer>> entry : matrix.entrySet()) {
+            Map<Integer, Double> newMapInsteadValues = new HashMap<>();
+            if (!entry.getValue().isEmpty()) {
+                for (Integer val : entry.getValue()) {
+                    newMapInsteadValues.put(val, 1. / (double) entry.getValue().size());
+                }
             } else {
-                int numberOfOnes = Collections.frequency(newLine, 1.);
-                newLine.replaceAll(e -> e / numberOfOnes);
+                for (int i = 0; i < matrix.size(); i++) {
+                    newMapInsteadValues.put(i, 1. / matrix.size());
+                }
             }
-            transposedMatrix.add(newLine);
+            newMatrix.put(entry.getKey(), newMapInsteadValues);
+
         }
-        return transposedMatrix;
+        return newMatrix;
     }
 
     private Double[] pageRankIterate(List<List<? extends Number>> matrix, Double[] vector) {

@@ -7,6 +7,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import ru.marushkai.infosearch.parser.enums.WhatToParse;
 import ru.marushkai.infosearch.parser.interfaces.Parser;
+import ru.marushkai.infosearch.parser.interfaces.Util;
 
 import java.io.FileWriter;
 import java.util.*;
@@ -19,6 +20,7 @@ public class ParserImpl implements Parser {
     public void parse(int matrixSize, String url, WhatToParse inOut, String fileName) throws Exception {
         String initialUrl = url;
         Set<String> forbidden = new HashSet<>();
+        Util optimalMatrixUtils = new UtilImpl();
         forbidden.add("mailto");
         Map<String, Set<String>> elements = new ConcurrentHashMap<>();
         elements.put(url, this.getInitialSet(url, initialUrl, inOut, forbidden));
@@ -41,26 +43,29 @@ public class ParserImpl implements Parser {
         // пройтись по сету с вершинами, если в мапе есть вершина - нужно ставить 0, иначе 1
         int[][] adjacency = new int[linksSet.size()][linksSet.size()];
 
-        try (FileWriter writer = new FileWriter(fileName)) {
+//        try (FileWriter writer = new FileWriter(fileName)) {
             int i = 0;
             for (String line : linksSet) {
                 int j = 0;
                 if (s.get(line) != null) {
                     for (String row : linksSet) {
                         if (s.get(line).contains(row)) {
-                            adjacency[i][j] = 1;
+                            adjacency[j][i] = 1;
                         } else {
-                            adjacency[i][j] = 0;
+                            adjacency[j][i] = 0;
                         }
-                        writer.append(String.valueOf(adjacency[i][j]));
-                        writer.append(",");
+//                        writer.append(String.valueOf(adjacency[i][j]));
+//                        writer.append(",");
                         j++;
                     }
                 }
-                writer.append("\n");
+//                writer.append("\n");
                 i++;
             }
-        }
+//        }
+
+
+        optimalMatrixUtils.writeOptimalToFile(optimalMatrixUtils.convertToOptimal(adjacency), fileName);
         System.out.println("Matrix height: " + adjacency.length);
         System.out.println("Matrix width: " + adjacency[0].length);
         int length = 0;
