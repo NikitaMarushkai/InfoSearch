@@ -34,12 +34,12 @@ public class UtilImpl implements Util {
     }
 
     @Override
-    public Map<Integer, List<Integer>> readOptimalFromFile(String fileName) {
-        Map<Integer, List<Integer>> mapFromFile = new HashMap<>();
+    public Map<Integer, List<Integer>> readOptimalFromFile(String fileName) throws IOException, ClassNotFoundException {
+        Map<Integer, List<Integer>> mapFromFile;
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileName))){
             mapFromFile = (Map<Integer, List<Integer>>) ois.readObject();
         } catch (IOException | ClassNotFoundException e ) {
-            e.printStackTrace();
+            throw e;
         }
         return mapFromFile;
     }

@@ -30,7 +30,7 @@ public class PageRankImpl implements PageRank {
     }
 
     @Override
-    public Double[] calculatePageRank(List<List<? extends Number>> matrix, int numberOfIterations) {
+    public Double[] calculatePageRank(Map<Integer, Map<Integer, Double>> matrix, int numberOfIterations) {
         Double[] initialVector = new Double[matrix.size()];
         Arrays.fill(initialVector, 1.);
         for (int i = 0; i < numberOfIterations; i++) {
@@ -59,15 +59,17 @@ public class PageRankImpl implements PageRank {
 //        }
 //        return transposedMatrix;
 //    }
-//@Override
+
+    @Override
     public Map<Integer, Map<Integer, Double>> prepareMatrix(Map<Integer, List<Integer>> matrix) {
+//        System.out.println(matrix.toString());
         Map<Integer, Map<Integer, Double>> newMatrix = new HashMap<>();
         for (Map.Entry<Integer, List<Integer>> entry : matrix.entrySet()) {
             Map<Integer, Double> newMapInsteadValues = new HashMap<>();
             if (!entry.getValue().isEmpty()) {
-                for (Integer val : entry.getValue()) {
-                    newMapInsteadValues.put(val, 1. / (double) entry.getValue().size());
-                }
+                entry.getValue().forEach(e ->
+                        newMapInsteadValues.put(e, 1. / (double) entry.getValue().size())
+                );
             } else {
                 for (int i = 0; i < matrix.size(); i++) {
                     newMapInsteadValues.put(i, 1. / matrix.size());
@@ -76,15 +78,29 @@ public class PageRankImpl implements PageRank {
             newMatrix.put(entry.getKey(), newMapInsteadValues);
 
         }
+//        System.out.println(newMatrix.toString());
         return newMatrix;
     }
 
-    private Double[] pageRankIterate(List<List<? extends Number>> matrix, Double[] vector) {
+    private Double[] pageRankIterate(Map<Integer, Map<Integer, Double>> matrix, Double[] vector) {
 
-        Double[] newVector = IntStream.range(0, matrix.size())
-                .mapToDouble(row -> IntStream.range(0, matrix.get(0).size())
-                        .mapToDouble(col -> matrix.get(col).get(row).doubleValue() * vector[col])
-                        .sum()).boxed().toArray(Double[]::new);
+        Double[] newVector = new Double[matrix.size()];
+        int rowIndex = 0;
+        for (Map.Entry<Integer, Map<Integer, Double>> row : matrix.entrySet()) {
+            Double sum = 0.;
+            for (Map.Entry<Integer, Double> col : row.getValue().entrySet()) {
+//            for (int column = 0; column < col.getValue().size(); column++) {
+//                sum += matrix[rowIndex][column]
+//                        * vector[column];
+                sum += col.getValue() * vector[col.getKey()];
+            }
+            newVector[rowIndex] = sum;
+            rowIndex++;
+        }
+//        Double[] newVector = IntStream.range(0, matrix.size())
+//                .mapToDouble(row -> IntStream.range(0, matrix.get(0).size())
+//                        .mapToDouble(col -> matrix.get(col).get(row).doubleValue() * vector[col])
+//                        .sum()).boxed().toArray(Double[]::new);
 
 
         newVector = Arrays.stream(newVector)

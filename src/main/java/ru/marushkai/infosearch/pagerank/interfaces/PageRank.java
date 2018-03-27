@@ -2,9 +2,13 @@ package ru.marushkai.infosearch.pagerank.interfaces;
 
 import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.Map;
 
 public interface PageRank {
+
     List<List<? extends Number>> readMatrix(String path) throws FileNotFoundException;
-    Double[] calculatePageRank(List<List<? extends Number>> matrix, int numberOfIterations);
-    List<List<? extends Number>> prepareMatrix(List<List<? extends Number>> matrix);
+
+    Double[] calculatePageRank(Map<Integer, Map<Integer, Double>> matrix, int numberOfIterations);
+
+    Map<Integer, Map<Integer, Double>> prepareMatrix(Map<Integer, List<Integer>> matrix);
 }
