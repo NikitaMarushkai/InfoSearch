@@ -20,10 +20,16 @@ public class Main {
         String fileName = "C:\\Programming\\infosearch\\matrix_marushkai.optimal";
         Util matrixUtils = new UtilImpl();
         try {
-            Map<Integer, Map<Integer, Double>> readyMatrix = pageRank.prepareMatrix(matrixUtils.readOptimalFromFile(fileName));
-            Arrays.stream(pageRank.calculatePageRank(readyMatrix, 500))
-                    .forEach(v -> System.out.print(v + ", "));
-            System.out.println();
+            long[] times = new long[10];
+            for (int t = 0; t < times.length; t++) {
+                long start = System.currentTimeMillis();
+                Map<Integer, Map<Integer, Double>> readyMatrix = pageRank.prepareMatrix(matrixUtils.readOptimalFromFile(fileName));
+                Arrays.stream(pageRank.calculatePageRank(readyMatrix, 500))
+                        .forEach(v -> System.out.print(v + ", "));
+                System.out.println();
+                times[t] = System.currentTimeMillis() - start;
+            }
+            System.out.println("Time:" + Arrays.stream(times).average());
         } catch (IOException | ClassNotFoundException e) {
             try {
                 parser.parse(200, "http://parts-on-line.be/", WhatToParse.ALL,

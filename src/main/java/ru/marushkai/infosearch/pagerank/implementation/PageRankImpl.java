@@ -61,7 +61,7 @@ public class PageRankImpl implements PageRank {
     }
 
     private Double[] pageRankIterate(Map<Integer, Map<Integer, Double>> matrix, Double[] vector) {
-        Double[] newVector = IntStream.range(0, matrix.size())
+        Double[] newVector = IntStream.range(0, matrix.size()).parallel()
                 .mapToDouble(row -> IntStream.range(0, matrix.size())
                         .mapToDouble(col -> (matrix.get(col).get(row) == null ? 0 : matrix.get(col).get(row)) * vector[col])
                         .sum()).boxed().toArray(Double[]::new);
