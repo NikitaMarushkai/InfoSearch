@@ -26,8 +26,8 @@ public class ParserImpl implements Parser {
         elements.put(url, this.getInitialSet(url, initialUrl, inOut, forbidden));
         Map<String, Set<String>> s = new ConcurrentHashMap<>();
         Set<String> failSet = new HashSet<>();
-        while (s.size() < matrixSize){
-            for (Map.Entry<String, Set<String>> entry : elements.entrySet()){
+        while (s.size() < matrixSize) {
+            for (Map.Entry<String, Set<String>> entry : elements.entrySet()) {
                 if (!failSet.contains(entry.getKey())) {
                     s.putAll(this.retrieveAllLinks(1, 0, matrixSize, elements, entry.getKey(), inOut,
                             forbidden, initialUrl));
@@ -43,26 +43,21 @@ public class ParserImpl implements Parser {
         // пройтись по сету с вершинами, если в мапе есть вершина - нужно ставить 0, иначе 1
         int[][] adjacency = new int[linksSet.size()][linksSet.size()];
 
-//        try (FileWriter writer = new FileWriter(fileName)) {
-            int i = 0;
-            for (String line : linksSet) {
-                int j = 0;
-                if (s.get(line) != null) {
-                    for (String row : linksSet) {
-                        if (s.get(line).contains(row)) {
-                            adjacency[j][i] = 1;
-                        } else {
-                            adjacency[j][i] = 0;
-                        }
-//                        writer.append(String.valueOf(adjacency[i][j]));
-//                        writer.append(",");
-                        j++;
+        int i = 0;
+        for (String line : linksSet) {
+            int j = 0;
+            if (s.get(line) != null) {
+                for (String row : linksSet) {
+                    if (s.get(line).contains(row)) {
+                        adjacency[j][i] = 1;
+                    } else {
+                        adjacency[j][i] = 0;
                     }
+                    j++;
                 }
-//                writer.append("\n");
-                i++;
             }
-//        }
+            i++;
+        }
 
 
         optimalMatrixUtils.writeOptimalToFile(optimalMatrixUtils.convertToOptimal(adjacency), fileName);
@@ -114,7 +109,7 @@ public class ParserImpl implements Parser {
                     } else {
                         return;
                     }
-                } catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             });
@@ -132,7 +127,7 @@ public class ParserImpl implements Parser {
             currentElements = doc.body().select("a[href]");
             for (Element element : currentElements) {
                 forbidden.forEach(f -> {
-                    if (!element.attr("abs:href").contains(f)){
+                    if (!element.attr("abs:href").contains(f)) {
                         switch (inOut) {
                             case ALL:
                                 links.add(element.attr("abs:href"));

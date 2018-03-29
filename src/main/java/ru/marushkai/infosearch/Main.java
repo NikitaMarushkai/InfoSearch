@@ -8,10 +8,8 @@ import ru.marushkai.infosearch.parser.implementation.ParserImpl;
 import ru.marushkai.infosearch.parser.enums.WhatToParse;
 import ru.marushkai.infosearch.parser.interfaces.Util;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 public class Main {
@@ -19,12 +17,11 @@ public class Main {
     public static void main(String[] args) {
         Parser parser = new ParserImpl();
         PageRank pageRank = new PageRankImpl();
-//        String fileName = "C:\\Programming\\infosearch\\matrix_marushkai.csv";
-        String fileName = "C:\\Programming\\infosearch\\matrix_marushkai.csv";
+        String fileName = "C:\\Programming\\infosearch\\matrix_marushkai.optimal";
         Util matrixUtils = new UtilImpl();
         try {
             Map<Integer, Map<Integer, Double>> readyMatrix = pageRank.prepareMatrix(matrixUtils.readOptimalFromFile(fileName));
-            Arrays.stream(pageRank.calculatePageRank(readyMatrix, 50))
+            Arrays.stream(pageRank.calculatePageRank(readyMatrix, 500))
                     .forEach(v -> System.out.print(v + ", "));
             System.out.println();
         } catch (IOException | ClassNotFoundException e) {

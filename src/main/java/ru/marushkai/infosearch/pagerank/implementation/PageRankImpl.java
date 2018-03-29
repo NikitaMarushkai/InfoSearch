@@ -39,30 +39,9 @@ public class PageRankImpl implements PageRank {
         return initialVector;
     }
 
-    //    @Override
-//    public List<List<? extends Number>> prepareMatrix(List<List<? extends Number>> matrix) {
-//        // Transpose matrix
-//        List<List<? extends Number>> transposedMatrix = new ArrayList<>();
-//
-//        for (int i = 0; i < matrix.get(0).size(); i++) {
-//            List<Double> newLine = new ArrayList<>();
-//            for (List<? extends Number> row : matrix) {
-//                newLine.add(row.get(i).doubleValue());
-//            }
-//            if (Collections.frequency(newLine, 0.) == newLine.size()){
-//                newLine.replaceAll(e -> 1. / newLine.size());
-//            } else {
-//                int numberOfOnes = Collections.frequency(newLine, 1.);
-//                newLine.replaceAll(e -> e / numberOfOnes);
-//            }
-//            transposedMatrix.add(newLine);
-//        }
-//        return transposedMatrix;
-//    }
 
     @Override
     public Map<Integer, Map<Integer, Double>> prepareMatrix(Map<Integer, List<Integer>> matrix) {
-//        System.out.println(matrix.toString());
         Map<Integer, Map<Integer, Double>> newMatrix = new HashMap<>();
         for (Map.Entry<Integer, List<Integer>> entry : matrix.entrySet()) {
             Map<Integer, Double> newMapInsteadValues = new HashMap<>();
@@ -78,29 +57,14 @@ public class PageRankImpl implements PageRank {
             newMatrix.put(entry.getKey(), newMapInsteadValues);
 
         }
-//        System.out.println(newMatrix.toString());
         return newMatrix;
     }
 
     private Double[] pageRankIterate(Map<Integer, Map<Integer, Double>> matrix, Double[] vector) {
-
-        Double[] newVector = new Double[matrix.size()];
-        int rowIndex = 0;
-        for (Map.Entry<Integer, Map<Integer, Double>> row : matrix.entrySet()) {
-            Double sum = 0.;
-            for (Map.Entry<Integer, Double> col : row.getValue().entrySet()) {
-//            for (int column = 0; column < col.getValue().size(); column++) {
-//                sum += matrix[rowIndex][column]
-//                        * vector[column];
-                sum += col.getValue() * vector[col.getKey()];
-            }
-            newVector[rowIndex] = sum;
-            rowIndex++;
-        }
-//        Double[] newVector = IntStream.range(0, matrix.size())
-//                .mapToDouble(row -> IntStream.range(0, matrix.get(0).size())
-//                        .mapToDouble(col -> matrix.get(col).get(row).doubleValue() * vector[col])
-//                        .sum()).boxed().toArray(Double[]::new);
+        Double[] newVector = IntStream.range(0, matrix.size())
+                .mapToDouble(row -> IntStream.range(0, matrix.size())
+                        .mapToDouble(col -> (matrix.get(col).get(row) == null ? 0 : matrix.get(col).get(row)) * vector[col])
+                        .sum()).boxed().toArray(Double[]::new);
 
 
         newVector = Arrays.stream(newVector)
