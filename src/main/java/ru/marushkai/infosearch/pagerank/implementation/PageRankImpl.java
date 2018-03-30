@@ -43,20 +43,19 @@ public class PageRankImpl implements PageRank {
     @Override
     public Map<Integer, Map<Integer, Double>> prepareMatrix(Map<Integer, List<Integer>> matrix) {
         Map<Integer, Map<Integer, Double>> newMatrix = new HashMap<>();
-        for (Map.Entry<Integer, List<Integer>> entry : matrix.entrySet()) {
+        matrix.forEach((key, value) -> {
             Map<Integer, Double> newMapInsteadValues = new HashMap<>();
-            if (!entry.getValue().isEmpty()) {
-                entry.getValue().forEach(e ->
-                        newMapInsteadValues.put(e, 1. / (double) entry.getValue().size())
+            if (!value.isEmpty()) {
+                value.forEach(e ->
+                        newMapInsteadValues.put(e, 1. / (double) value.size())
                 );
             } else {
                 for (int i = 0; i < matrix.size(); i++) {
                     newMapInsteadValues.put(i, 1. / matrix.size());
                 }
             }
-            newMatrix.put(entry.getKey(), newMapInsteadValues);
-
-        }
+            newMatrix.put(key, newMapInsteadValues);
+        });
         return newMatrix;
     }
 
